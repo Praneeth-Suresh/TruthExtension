@@ -1,0 +1,17 @@
+{
+    "name": "Truthflow on YouTube",
+    "description": "Is what you see on YouTube true? Truthflow verifies it for you.",
+    "version": "1.0",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "app.html",
+        "default_icon": "Images/Gandalf.png"
+    },
+    "host_permissions": ["https://*.youtube.com/*"],
+    "content_scripts": [
+	    {
+	      "matches": ["https://*.youtube.com/*"],
+	      "js": ["scripts/content.js"]
+	    }
+    ]
+}
