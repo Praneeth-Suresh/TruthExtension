@@ -67,3 +67,53 @@ function runPopupScript() {
         });
     }, 5000); // Short delay allows title to update
 }
+
+
+
+//********************************************************************** */
+// The below code is used to retrieve the time elapsed for the video
+// and contantly push it to the extension
+
+let intervalId = null;
+
+// Function to find the video element and send time updates
+function startTimeUpdates() {
+    // Find the main video element on the page
+    const video = document.querySelector('video');
+
+    if (video) {
+        console.log("Content script found video element. Starting time updates.");
+
+        // Clear any existing interval to avoid duplicates if the script runs again
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
+
+         intervalId = setInterval(() => {
+            const currentVideo = document.querySelector('video');
+            if (currentVideo) {
+                chrome.runtime.sendMessage({
+                    type: "UPDATE_TIME",
+                    currentTime: currentVideo.currentTime
+                }).catch(error => {});
+            } else {
+                // If video element is no longer found, stop updates
+                console.log("Video element not found. Stopping time updates.");
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+         }, 250);
+
+    } else {
+        console.log("Content script could not find video element.");
+
+        setTimeout(startTimeUpdates, 1000); // Try again after 1 second
+    }
+}
+
+// Start trying to find the video when the script is injected
+startTimeUpdates();
+
+// You might also want to listen for messages from the popup,
+// e.g., if the popup wants to request the time on demand.
+// For this example, the content script just pushes updates.
