@@ -7,15 +7,25 @@
         <h1>Truthflow for YouTube</h1>
         <p>You are now watching:</p>
         <p id = "VideoTitle"> Navigate to a youtube video </p>
+
+        <p><b>Current Video Time</b></p>
+        <p><span id="currentTimeDisplay">Loading...</span></p>
+
         <div class="row">
-            <div class="column">
-                <p><b>Current Video Time</b></p>
-                <p><span id="currentTimeDisplay">Loading...</span></p>
+            <div class="column" id="instruction">
+                Press <b>Mark</b> to start marking out a segment of the video you think is misinformation
             </div>
-            <div class="column">
+            <div class="column"><center>
+                <br>
                 <button id="stamp" color="green">Mark</button>
-            </div>
-          </div>
+            </center></div>
+        </div>
+
+        <br>
+        <div id="marked">
+
+        </div>
+
         <script src="scripts/popup.js"></script>
     </body>
 </html>

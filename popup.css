@@ -24,3 +24,8 @@ body {
       display: table;
       clear: both;
     }
+
+input {
+  border: none;
+  border-color: transparent;
+}

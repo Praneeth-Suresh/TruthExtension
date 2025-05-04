@@ -57,6 +57,8 @@ function formatTime(seconds) {
     }
 }
 
+var currentTime = 0;
+
 // Wait for the DOM to be fully loaded before trying to access elements
 document.addEventListener('DOMContentLoaded', () => {
     const timeDisplayElement = document.getElementById('currentTimeDisplay');
@@ -65,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Check if the message is the one we're looking for
         if (request.type === "UPDATE_TIME") {
-            const currentTime = request.currentTime;
+            currentTime = request.currentTime;
             // Format the time and update the display element
             timeDisplayElement.textContent = formatTime(currentTime);
         }
@@ -77,13 +79,29 @@ document.addEventListener('DOMContentLoaded', () => {
 //********************************************************* */
 // Below is the code to handle the marking of timestamps
 button = document.getElementById("stamp");
+marked = document.getElementById("marked");
+instruction = document.getElementById("instruction");
+var box_no = -1;
 
 button.addEventListener('click', function() {
     if ( button.innerHTML === "Mark" ) {
+        // Update the display to show 
         button.innerHTML = "Stop";
         button.style.color = "red";
+
+        box_no += 1;
+
+        marked.innerHTML += `
+        <div>
+        The start time is <p id="${box_no}StartTime"></p>
+        The end time is <input type="text" id="endTime" name="endTime" placeholder="hh:mm:ss">
+        </div><br>`;
+        StartTime = document.getElementById(`${box_no}StartTime`);
+        StartTime.textContent = formatTime(currentTime);
+        instruction.innerHTML = "Press <b>Stop</b> to signal the end of the segment of the video you think is misinformation"
     } else if ( button.innerHTML === "Stop" ) {
         button.innerHTML = "Mark";
         button.style.color = "green";
+        instruction.innerHTML = "Press <b>Mark</b> to start marking out a segment of the video you think is misinformation";
     }
   });
