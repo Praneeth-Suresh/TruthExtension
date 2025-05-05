@@ -1,5 +1,3 @@
-import axios from "axios";
-
 
 // This function ensures the code waits for the page to load before searching for the title
 function waitForElements(selector, callback) {
@@ -144,14 +142,16 @@ const misleadingClaims = [
 
 console.log("Starting to retieve from REST API ...")
 
-function getErrors() {
-    axios
-    .get("https://127.0.0.1:8000/api/errors")
-    .then((res) => console.log("This is recieved from REST API", res.data))
-    .catch((err) => console.log("Error ", err));
-}
+chrome.runtime.sendMessage({ action: "fetchErrors" }, (response) => {
+    console.log("Received data:", response);
+});
 
-getErrors();
+// function getErrors() {
+//     axios
+//     .get("http://127.0.0.1:8000/api/errors")
+//     .then((res) => console.log("This is recieved from REST API", res.data))
+//     .catch((err) => console.log("Error ", err));
+// }
 
 // --- CSS for the injected popup ---
 const popupCss = `

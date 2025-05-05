@@ -1,3 +1,5 @@
+import axios from "axios";
+
 const VideoTitle = document.getElementById("VideoTitle");
 
 window.onload = function() {
@@ -19,8 +21,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Tell the content script when the extension is active
 
+var ExtensionOpen;
 
-intervalPopup = setInterval(() => {
+var intervalPopup = setInterval(() => {
     var views = chrome.extension.getViews({ type: "popup" });
 
     // Check if the extension is open or closed by checking if any tabs are identified
@@ -31,6 +34,29 @@ intervalPopup = setInterval(() => {
     }
 }, 250);
 
+
+//********************************************************* */
+// The following makes request to backend server
+// function getErrors() {
+//     axios
+//     .get("http://127.0.0.1:8000/api/errors")
+//     .then((res) => console.log("This is recieved from REST API", res.data))
+//     .catch((err) => console.log("Error ", err));
+// }
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "fetchErrors") {
+        console.log("Retrieving information");
+        axios.get("http://127.0.0.1:8000/api/errors")
+            .then(response => {
+                sendResponse(response.data);
+                console.log(response.data);
+            })
+            .catch(error => sendResponse({ error: error.message }));
+
+        return true; // Keeps the response asynchronous
+    }
+});
 
 
 //********************************************************* */

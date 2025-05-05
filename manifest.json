@@ -11,12 +11,13 @@
     "permissions": [
       "activeTab",
       "scripting",
-      "storage"
+      "storage",
+      "http://127.0.0.1:8000/*"
     ],
     "content_scripts": [
 	    {
 	      "matches": ["https://*.youtube.com/*"],
-	      "js": ["content.bundle.js"],
+	      "js": ["scripts/content.js"],
         "run_at": "document_idle"
 	    }
     ]

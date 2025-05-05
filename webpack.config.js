@@ -1,7 +1,7 @@
 module.exports = {
-    entry: './scripts/content.js',
+    entry: './scripts/popup.js',
     output: {
-      filename: 'content.bundle.js',
+      filename: 'popup.bundle.js',
       path: __dirname,
     },
   };
