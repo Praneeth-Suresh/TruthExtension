@@ -7,12 +7,14 @@
         "default_popup": "app.html",
         "default_icon": "Images/Gandalf.png"
     },
-    "host_permissions": ["https://*.youtube.com/*"],
+    "host_permissions": [
+      "https://*.youtube.com/*",
+      "http://localhost:8000/*"
+    ],
     "permissions": [
       "activeTab",
       "scripting",
-      "storage",
-      "http://127.0.0.1:8000/*"
+      "storage"
     ],
     "content_scripts": [
 	    {

@@ -394,3 +394,40 @@ Vidobserver.observe(document.body, { childList: true, subtree: true });
 // when the script first loads (e.g., on a full page navigation).
 // Add a slight delay to allow the page to render initially.
 setTimeout(setupVideoPlayer, 500);
+
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log("Fact Check Extension: Message received in content script:", request.type);
+
+    if (request.type === "PAUSE_VIDEO") {
+        if (videoElement && !videoElement.paused) {
+            console.log("Fact Check Extension: Pausing video...");
+            videoElement.pause(); // <-- This is the core pause command
+            sendResponse({ status: "paused" }); // Acknowledge the message
+        } else if (videoElement && videoElement.paused) {
+             console.log("Fact Check Extension: Video is already paused.");
+             sendResponse({ status: "already_paused" });
+        } else {
+            console.warn("Fact Check Extension: Cannot pause, video element not found.");
+            sendResponse({ status: "video_not_found" });
+        }
+         return true; // Required if you might send a response asynchronously
+    }
+
+    // // This is for future development purposes
+    // // You can add other message types here, like "PLAY_VIDEO"
+    // if (request.type === "PLAY_VIDEO") {
+    //     if (videoElement && videoElement.paused) {
+    //         console.log("Fact Check Extension: Playing video...");
+    //         videoElement.play(); // <-- Command to play
+    //         sendResponse({ status: "played" });
+    //     } else if (videoElement && !videoElement.paused) {
+    //             console.log("Fact Check Extension: Video is already playing.");
+    //             sendResponse({ status: "already_playing" });
+    //     } else {
+    //         console.warn("Fact Check Extension: Cannot play, video element not found.");
+    //         sendResponse({ status: "video_not_found" });
+    //     }
+    //     return true;
+    // }
+});

@@ -37,22 +37,29 @@ var intervalPopup = setInterval(() => {
 
 //********************************************************* */
 // The following makes request to backend server
-// function getErrors() {
-//     axios
-//     .get("http://127.0.0.1:8000/api/errors")
-//     .then((res) => console.log("This is recieved from REST API", res.data))
-//     .catch((err) => console.log("Error ", err));
-// }
+// axios.get("http://127.0.0.1:8000/api/errors")
+// .then(response => {
+//     sendResponse(response.data);
+//     console.log(response.data);
+// })
+// .catch(error => sendResponse({ error: error.message }));
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "fetchErrors") {
         console.log("Retrieving information");
-        axios.get("http://127.0.0.1:8000/api/errors")
-            .then(response => {
-                sendResponse(response.data);
-                console.log(response.data);
-            })
-            .catch(error => sendResponse({ error: error.message }));
+
+        fetch("http://127.0.0.1:8000/api/errors", {
+            method: 'GET',  // Use GET to check session validity
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => {
+            sendResponse(response.data);
+            console.log(response.data);            
+        })
+        .catch(error => sendResponse({ error: error.message }))
+
 
         return true; // Keeps the response asynchronous
     }
@@ -104,30 +111,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //********************************************************* */
 // Below is the code to handle the marking of timestamps
-button = document.getElementById("stamp");
-marked = document.getElementById("marked");
-instruction = document.getElementById("instruction");
+var button = document.getElementById("stamp");
+var marked = document.getElementById("marked");
+var instruction = document.getElementById("instruction");
 var box_no = -1;
 
 button.addEventListener('click', function() {
     if ( button.innerHTML === "Mark" ) {
         // Update the display to show 
-        button.innerHTML = "Stop";
+        button.innerHTML = "Submit";
         button.style.color = "red";
 
         box_no += 1;
 
         marked.innerHTML += `
         <div>
-        The start time is <p id="${box_no}StartTime"></p>
-        The end time is <input type="text" id="endTime" name="endTime" placeholder="hh:mm:ss">
+        The start time is <span id="${box_no}StartTime"></span>
+        The reason this is erroneous is because <input type="text" id="reason" name="reason" placeholder="Statement ..."><span id="${box_no}res_pres"></span>
         </div><br>`;
-        StartTime = document.getElementById(`${box_no}StartTime`);
+        var StartTime = document.getElementById(`${box_no}StartTime`);
         StartTime.textContent = formatTime(currentTime);
-        instruction.innerHTML = "Press <b>Stop</b> to signal the end of the segment of the video you think is misinformation"
-    } else if ( button.innerHTML === "Stop" ) {
+        instruction.innerHTML = "Press <b>Submit</b> submit the statement about why this is disinformation."
+
+        // Send a message to the content script to pause the video
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const activeTab = tabs[0];
+            if (activeTab && activeTab.id) {
+                // Send a message to the content script in the active tab
+                chrome.tabs.sendMessage(activeTab.id, {
+                type: "PAUSE_VIDEO" // Define a message type
+                }, (response) => {
+                // Optional: Handle response from content script if needed
+                if (chrome.runtime.lastError) {
+                    console.error("Error sending message:", chrome.runtime.lastError.message);
+                } else {
+                    console.log("Message sent to content script:", response);
+                }
+                });
+            } else {
+                console.warn("Could not find active tab.");
+            }
+        });
+
+    } else if ( button.innerHTML === "Submit" ) {
         button.innerHTML = "Mark";
         button.style.color = "green";
-        instruction.innerHTML = "Press <b>Mark</b> to start marking out a segment of the video you think is misinformation";
+        instruction.innerHTML = "Press <b>Mark</b> to mark out a segment of the video you think is misinformation";
+
+        // This removes the input box and converts it to text
+        var statement = document.getElementById("reason");
+        var reason = statement.value;
+        console.log(reason);
+        statement.readOnly = true;
+        statement.disabled = true;
     }
   });
