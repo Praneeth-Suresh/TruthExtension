@@ -48,10 +48,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "fetchErrors") {
         console.log("Retrieving information");
 
-        fetch("http://127.0.0.1:8000/api/errors", {
+        fetch("http://127.0.0.1:8000/APIHome", {
             method: 'GET',  // Use GET to check session validity
             headers: {
                 'Content-Type': 'application/json'
+            },
+            params: {
+                URL: "Holder" // Here you can add data to send to the backend
             },
         })
         .then(response => {
@@ -116,6 +119,24 @@ var marked = document.getElementById("marked");
 var instruction = document.getElementById("instruction");
 var box_no = -1;
 
+function PostData( time, reason) {
+    console.log("Posting timestamp ", time);
+
+    const request = {
+        "User": "Praneeth",
+        "time": time,
+        "reason": reason,
+    }
+
+    axios.post(`http://127.0.0.1:8000/input/`, { request } )
+    .then(res => {
+      console.log(res);
+      console.log(res.data);
+    })
+}
+
+var StartTime;
+
 button.addEventListener('click', function() {
     if ( button.innerHTML === "Mark" ) {
         // Update the display to show 
@@ -129,7 +150,7 @@ button.addEventListener('click', function() {
         The start time is <span id="${box_no}StartTime"></span>
         The reason this is erroneous is because <input type="text" id="reason" name="reason" placeholder="Statement ..."><span id="${box_no}res_pres"></span>
         </div><br>`;
-        var StartTime = document.getElementById(`${box_no}StartTime`);
+        StartTime = document.getElementById(`${box_no}StartTime`);
         StartTime.textContent = formatTime(currentTime);
         instruction.innerHTML = "Press <b>Submit</b> submit the statement about why this is disinformation."
 
@@ -164,5 +185,8 @@ button.addEventListener('click', function() {
         console.log(reason);
         statement.readOnly = true;
         statement.disabled = true;
+
+        // Send the reason over to python
+        PostData( StartTime, reason);
     }
   });
