@@ -25,6 +25,12 @@ waitForElements("h1.ytd-watch-metadata yt-formatted-string", (videoTitles) => {
     chrome.storage.local.set({ title: VideoName });    
 });
 
+// This code is used to retrieve data from the database
+// This code is run every time a new page is loaded
+function GetStamps(url) {
+    
+}
+
 // The below code is required to listen for URL changes when clicking a new video.
 // This is because YouTube uses AJAX to load new videos without refreshing the page.
 // This code listens for changes in the URL and runs the popup script again when a new video is detected.
@@ -121,29 +127,20 @@ startTimeUpdates();
 
 // This is hardcoded for demonstration. In a real extension, you'd likely
 // load this data from extension storage or an external source based on the video ID.
-const misleadingClaims = [
-    {
-        time: 15, // Timestamp in seconds (1 minute 5 seconds)
-        claimSummary: "Potential claim about [Topic A] lacks evidence.",
-        learnMoreUrl: "http://example.com/factcheck-topic-a"
-    },
-    {
-        time: 32, // Timestamp in seconds (3 minutes 2 seconds)
-        claimSummary: "Consider alternative perspectives on [Topic B].",
-        learnMoreUrl: "http://example.com/factcheck-topic-b"
-    },
-    {
-        time: 56, // Timestamp in seconds (5 minutes 0 seconds)
-        claimSummary: "Info regarding [Topic C] might be outdated or disputed.",
-        learnMoreUrl: "http://example.com/factcheck-topic-c"
-    }
-    // Add more claims here
-];
+const misleadingClaims = [];
 
 console.log("Starting to retieve from REST API ...")
 
 chrome.runtime.sendMessage({ action: "fetchErrors" }, (response) => {
     console.log("Received data:", response);
+
+    for (let i = 0; i < response.length; i++ ) {
+        misleadingClaims[i] = {
+            time: response[i]["time"], // Timestamp in seconds 
+            claimSummary: response[i]["claimSummary"],
+            learnMoreUrl: response[i]["errorMetrics"]["URL"]
+        }
+    }
 });
 
 // function getErrors() {
